@@ -48,7 +48,8 @@ public class LiteratureController implements HttpHandler {
 
         // Action bestimmen
 
-        // Startseite
+        // Startseite.
+        // Test
         String regex = "action=(.*)&?";
         Pattern pattern = Pattern.compile(regex, Pattern.CASE_INSENSITIVE);
         Matcher matcher = pattern.matcher(url);
