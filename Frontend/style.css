@@ -1,0 +1,27 @@
+/*css1*/
+.flex-container {
+			display: flex;
+			align-items: center;
+			flex-direction: column;
+			background-color: DodgerBlue;
+		}
+
+		.flex-container > div {
+			background-color: #f1f1f1;
+			margin: 10px;
+			padding: 20px;
+			font-size: 30px;
+		}
+		#options{
+			margin: auto;
+			height: 10px;
+		}
+		.items{
+			display: flex;
+			height: 200%;
+			width: 50%;
+			align-items: flex-start;
+			padding: 0px;
+			border: 0px;
+			margin: 0px;
+		}
