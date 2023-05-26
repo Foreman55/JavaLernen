@@ -4,6 +4,7 @@
 			align-items: center;
 			flex-direction: column;
 			background-color: DodgerBlue;
+			width: 90%;
 		}
 
 		.flex-container > div {
@@ -24,4 +25,14 @@
 			padding: 0px;
 			border: 0px;
 			margin: 0px;
+		}
+
+		.flexbox{
+		display:flex;
+		flex-direction:row;
+		}
+
+		.flexbox1{
+		display:flex;
+		flex-direction:column;
 		}
