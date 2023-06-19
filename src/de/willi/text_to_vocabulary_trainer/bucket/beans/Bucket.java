@@ -8,13 +8,6 @@ import java.util.List;
 
 public class Bucket {
 
-    public List<Vocabulary> getVocabularyList() {
-        return vocabularyList;
-    }
-
-    public void setVocabularyList(List<Vocabulary> vocabularyList) {
-        this.vocabularyList = vocabularyList;
-    }
 
     private List<Vocabulary> vocabularyList;
     private static Bucket bucket;
@@ -31,6 +24,14 @@ public class Bucket {
         return bucket;
     }
 
+    public List<Vocabulary> getVocabularyList() {
+        return vocabularyList;
+    }
+
+    public void setVocabularyList(List<Vocabulary> vocabularyList) {
+        this.vocabularyList = vocabularyList;
+    }
+    
     public void save(String word){
         Vocabulary vocabulary = new Vocabulary();
         vocabulary.setWord(word);

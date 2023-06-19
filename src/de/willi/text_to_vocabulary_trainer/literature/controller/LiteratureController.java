@@ -2,9 +2,12 @@ package de.willi.text_to_vocabulary_trainer.literature.controller;
 
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
+import de.willi.text_to_vocabulary_trainer.Users.User;
+import de.willi.text_to_vocabulary_trainer.Users.UsersList;
 import de.willi.text_to_vocabulary_trainer.bucket.beans.Bucket;
 import de.willi.text_to_vocabulary_trainer.literature.HtmlStrings;
 import de.willi.text_to_vocabulary_trainer.literature.beans.*;
+import de.willi.text_to_vocabulary_trainer.literature.mysql.Mysql;
 import de.willi.text_to_vocabulary_trainer.literature.view.*;
 import java.io.File;
 import java.io.IOException;
@@ -24,11 +27,11 @@ public class LiteratureController implements HttpHandler {
     List<FlashCard> flashCardList = FlashCards.getInstance().getFlashCards();
     Bucket bucket = Bucket.getInstance();
 
-
     @Override
     public void handle(HttpExchange exchange) throws IOException {
         // URL holen
         String url =  exchange.getRequestURI().toString();
+        System.out.println(url);
         // CSS ausgeben
         if (url.matches(".*/css/(.*)")){
             // CSS-Dateiname ermitteln
@@ -54,7 +57,6 @@ public class LiteratureController implements HttpHandler {
         Pattern pattern = Pattern.compile(regex, Pattern.CASE_INSENSITIVE);
         Matcher matcher = pattern.matcher(url);
         boolean matchFound = matcher.find();
-
         // Wenn der Benutzer die Seite das erste mal aufruft, damit er die URL eingeben kann
         if (!matchFound){
             String html = StartView.renderView();
@@ -69,6 +71,7 @@ public class LiteratureController implements HttpHandler {
             urlOut = one[0];
             // Action auslesen
             String action = matcher.group(1);
+            System.out.println(action);
             // Document von URL erstellen
             if (action.equals("process-request")){
                 // URl Holen
@@ -90,6 +93,62 @@ public class LiteratureController implements HttpHandler {
                     System.out.println(paramUrl);
                 }
                 // Document.creat mit URL
+            }
+
+            if(action.equals("RegisterView")){
+                    String out = RegisterView.renderView();
+                    response(out, exchange);
+                }
+
+            if(action.equals("process_register")){
+            String fullnameRegex = "fullname=([a-z0-9-_%.]*)&";
+            String passwordRegex = "password=([a-z0-9-_%.]*)&";
+            String confirm_passwordRegex = "confirm-password=([a-z0-9-_%.]*)&";
+            Pattern patternFullName = Pattern.compile(fullnameRegex, Pattern.CASE_INSENSITIVE);
+            Pattern patternPassword = Pattern.compile(passwordRegex, Pattern.CASE_INSENSITIVE);
+            Pattern patternConfirmPassword = Pattern.compile(confirm_passwordRegex, Pattern.CASE_INSENSITIVE);
+            Matcher fullNameMatcher = patternFullName.matcher(url);
+            Matcher passwordMatcher = patternPassword.matcher(url);
+            Matcher confirmMatcher = patternConfirmPassword.matcher(url);
+            boolean matchFoundUrl = fullNameMatcher.find();
+            boolean passwordBool = passwordMatcher.find();
+            boolean confirmBool = confirmMatcher.find();
+            String fullname = fullNameMatcher.group(1);
+            String password = passwordMatcher.group(1);
+            String confirm = confirmMatcher.group(1);
+            if(!password.equals(confirm)){
+                String out = RegisterView.renderView();
+                response(out, exchange);
+               }else {
+                User user = new User(fullname,password,confirm);
+                System.out.println("fullname" + user.getName() + "password" + user.getPassword() + "confirm" + user.getEmail());
+                UsersList.addToList(user);
+                Mysql.insertNewUser(user);
+                String out = LoginView.renderView();
+                response(out, exchange);
+            }
+            }
+            if(action.equals("LoginView")){
+                String out = LoginView.renderView();
+                response(out, exchange);
+            }
+
+            if(action.equals("process_register_login")){
+                String fullnameRegex = "username=([a-z0-9-_%.]*)&";
+                String passwordRegex = "password=([a-z0-9-_%.]*)&";
+                Pattern patternFullName = Pattern.compile(fullnameRegex, Pattern.CASE_INSENSITIVE);
+                Pattern patternPassword = Pattern.compile(passwordRegex, Pattern.CASE_INSENSITIVE);
+                Matcher fullNameMatcher = patternFullName.matcher(url);
+                Matcher passwordMatcher = patternPassword.matcher(url);
+                boolean matchFoundUrl = fullNameMatcher.find();
+                boolean passwordBool = passwordMatcher.find();
+                String username = fullNameMatcher.group(1);
+                String password = passwordMatcher.group(1);
+                boolean verifyUser = UsersList.verifyUser(username, password);
+                if(verifyUser){
+                    String out = ProfileView.renderView();
+                    response(out, exchange);
+                }
             }
 
             if(action.equals("saveWord")){
@@ -196,19 +255,14 @@ public class LiteratureController implements HttpHandler {
             }
 
 
-            Path path = Paths.get(Constant.PATH_TEMPLATE_FOLDER + File.separator + "Template.html");
-            String template = "";
+            Path path = Paths.get(Constant.PATH_TEMPLATE_FOLDER_Wizard + File.separator + "intro.html");
+            String out = "";
             for (String line: Files.readAllLines(path)){
-                template += line + "\n";
-            }
-            String buttons = "";
-            Path pathbuttons = Paths.get(Constant.PATH_TEMPLATE_FOLDER + File.separator + "buttons.html");
-            for (String line: Files.readAllLines(pathbuttons)){
-                buttons += line + "\n";
+                out += line + "\n";
             }
 
-            String out = template.replaceAll("<!--Content1-->", urlOut ).replaceAll("<!--buttons-->", buttons);
-            out = out.replaceAll("show", "none");
+
+
             response(out, exchange);
         }
     }

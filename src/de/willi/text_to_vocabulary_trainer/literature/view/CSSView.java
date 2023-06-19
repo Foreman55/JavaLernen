@@ -12,7 +12,7 @@ public class CSSView {
 
     public static String renderView(String fielname){
         StringBuilder contentBuilder = new StringBuilder();
-        Path filePath = Path.of(PATH_TEMPLATE_FOLDER + File.separator + fielname);
+        Path filePath = Path.of(PATH_TEMPLATE_FOLDER_Wizard + File.separator + fielname);
         try (BufferedReader br = new BufferedReader(new FileReader(String.valueOf(filePath)))) {
             String sCurrentLine;
             while ((sCurrentLine = br.readLine()) != null)
